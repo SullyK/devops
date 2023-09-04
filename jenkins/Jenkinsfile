@@ -1,0 +1,32 @@
+pipeline{
+    agent any
+    
+    stages {
+	stage('Checkout Code') {
+	    steps{
+		checkout([$class: 'GitSCM',
+		branches: [[name: 'main']],
+		doGenerateSubmoduleConfigurations: false,
+		extensions: [[$class: 'CleanCheckout']],
+		submoduleCfg: [],
+		userRemoteConfigs: [[url: "https://github.com/SullyK/devops"]]
+		])
+
+		echo "code downloaded"
+	    }
+	}
+
+	stage("Build Docker Image") {
+	    steps{
+		script{
+		    def repoPath = "${env.WORKSPACE}"
+		    def filePath = "docker/"
+
+		    def fullPath = "${repoPath}/${filePath}"
+		    def dockerFileString = readFile(file: "${fullPath}/dockerFile")
+		    echo "${dockerFileString}"
+		}
+	    }
+	}
+    }
+}
